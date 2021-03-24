@@ -5,6 +5,6 @@ class Licence:
         self.date_debut = date_debut
         self.date_fin = date_fin
         self.user = user # Pas un int, donner directment l'objet user associé ^^
-        self.jeu = jeu # Pareil
+        self.game = jeu # Pareil
         self.hash = hash
         self.pret_by = pret_by

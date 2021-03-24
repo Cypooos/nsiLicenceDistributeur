@@ -1,14 +1,14 @@
-from core.dataclasses.game import Game
-from core.dataclasses.licence import Licence
-from core.dataclasses.revue import Revue
-from core.dataclasses.user import User
+from core.dataclass.game import Game
+from core.dataclass.licence import Licence
+from core.dataclass.revue import Revue
+from core.dataclass.user import User
 
 
 class LicenceManager:
 
     path = "./projet.db"
 
-    def __init__():
+    def __init__(self):
         self.users = []
         self.games = []
         self.licences = []
@@ -46,7 +46,7 @@ class LicenceManager:
             
 
             
-            returning["graph"][game.name] = [x[1] for x in points]
+            returning["graph"][game.name] = [(x[0],x[1]) for x in points]
         
         return returning
 
@@ -61,4 +61,27 @@ class LicenceManager:
         # obtenir la liste des revues, la mettre sous une liste d'instances de Revue()
         # obtenir la liste des users, la mettre sous une liste d'instances de Users()
         # obtenir la liste des licences, la mettre sous une liste d'instances de Licence()
-        pass
+        
+        self.games = [
+            Game(1,"BigBoy","A BIG GAME BOY",69,0),
+            Game(2,"BigBoy2","A BIG GAME BOY 2",79,0),
+            Game(3,"BigBoy3","A BIG GAME BOY 3",89,0),
+            Game(5,"small boy","A small GAME BOY",19,20)
+        ]
+        
+        self.users = [
+            User("Cypooos","hashed1"),
+            User("Admin","hashed2"),
+            ]
+
+        self.licences = [
+            Licence(1,100,120,self.users[0],self.games[0],"69FUEHF"),
+            Licence(1,103,110,self.users[0],self.games[0],"69FUEHF"),
+            Licence(1,105,115,self.users[0],self.games[0],"69FUEHF"),
+            Licence(1,102,150,self.users[0],self.games[0],"69FUEHF"),
+            
+            Licence(1,100,120,self.users[0],self.games[1],"69FUEHF"),
+            Licence(1,100,120,self.users[0],self.games[2],"69FUEHF"),
+            Licence(1,100,130,self.users[0],self.games[2],"69FUEHF"),
+        ]
+        self.revues = []
