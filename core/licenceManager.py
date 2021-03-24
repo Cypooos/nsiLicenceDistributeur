@@ -19,7 +19,7 @@ class LicenceManager:
         
         self.reload()
     
-    def getStats(self):
+    def getStats(self,to_=100):
 
         returning = {}
 
@@ -28,12 +28,16 @@ class LicenceManager:
 
 
         returning["graph"] = {}
+        minimum = 99999999999
+        maximum = -99999999999
         for game,licences in game_to_licences.items():
+
+            if licences == []:continue
 
             points = []
             for licence in licences:
-                points.append([licence.date_debut,"+"])
-                points.append([licence.date_fin,"-"])
+                if licence.date_debut <= to_:points.append([licence.date_debut,"+"])
+                if licence.date_fin <= to_:points.append([licence.date_fin,"-"])
             
             points.sort(key=lambda x:x[0])
             
@@ -44,10 +48,14 @@ class LicenceManager:
                 
                 points[i][1] = active_value
             
-
+            if points[0][0] <= minimum: minimum = points[0][0]
+            if points[-1][0] >= maximum: maximum = points[-1][0]
             
             returning["graph"][game.name] = [(x[0],x[1]) for x in points]
         
+        returning["graph_min_x"] = minimum
+        returning["graph_max_x"] = maximum
+
         return returning
 
 

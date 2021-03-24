@@ -12,7 +12,9 @@ class GUI:
 
         # test:
         if debug:
-            print(self.lm.getStats())
+            print(
+            "\n".join([x+":"+str(y) for x,y in self.lm.getStats(to_=112).items() ])
+                )
 
         self.window.mainloop()
     
