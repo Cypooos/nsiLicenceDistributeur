@@ -3,6 +3,7 @@ from core.dataclass.licence import Licence
 from core.dataclass.revue import Revue
 from core.dataclass.user import User
 
+from datetime import date
 
 class LicenceManager:
 
@@ -18,27 +19,46 @@ class LicenceManager:
         self.connexion = ...
         
         self.reload()
-    
-    def getStats(self,to_=100):
+
+
+    def getStats(self,add_after=10):
+
+        now = (date.today() - date(2021,1,1)).days
 
         returning = {}
+        
+        returning["info_down"] = {
+            "Nombre de licences en total":len(self.licences),
+            "Nombre de pret en total":0,
+            "Nombre de licences active":0,
+            "Nombre de licences active pretee":0,
+        }
 
         game_to_licences = {x:[] for x in self.games}
-        for licence in self.licences:game_to_licences[licence.game].append(licence)
 
+        for licence in self.licences:
+            game_to_licences[licence.game].append(licence)
+            is_time = licence.date_debut <= now <= licence.date_fin
+            is_pretee = licence.user_pret != None and not licence.is_recive
+            if is_time:returning["info_down"]["Nombre de licences active"] += 1
+            if is_time and is_pretee:returning["info_down"]["Nombre de licences active pretee"] += 1
+            if is_pretee:returning["info_down"]["Nombre de pret en total"] += 1
+
+                
 
         returning["graph"] = {}
         minimum = 99999999999
         maximum = -99999999999
         for game,licences in game_to_licences.items():
 
-            if licences == []:continue
 
             points = []
             for licence in licences:
-                if licence.date_debut <= to_:points.append([licence.date_debut,"+"])
-                if licence.date_fin <= to_:points.append([licence.date_fin,"-"])
+                if licence.date_debut <= now+add_after:points.append([licence.date_debut,"+"])
+                if licence.date_fin <= now+add_after:points.append([licence.date_fin,"-"])
             
+            if points == []:continue
+
             points.sort(key=lambda x:x[0])
             
             active_value = 0
@@ -54,6 +74,7 @@ class LicenceManager:
             returning["graph"][game.name] = [(x[0],x[1]) for x in points]
         
         returning["graph_min_x"] = minimum
+        returning["graph_middle"] = now
         returning["graph_max_x"] = maximum
 
         return returning
@@ -83,13 +104,16 @@ class LicenceManager:
             ]
 
         self.licences = [
-            Licence(1,100,120,self.users[0],self.games[0],"69FUEHF"),
-            Licence(1,103,110,self.users[0],self.games[0],"69FUEHF"),
-            Licence(1,105,115,self.users[0],self.games[0],"69FUEHF"),
-            Licence(1,102,150,self.users[0],self.games[0],"69FUEHF"),
+            Licence(1,80,90,self.users[0],self.games[0],"69FUEHF"),
+            Licence(1,83,90,self.users[0],self.games[0],"69FUEHF"),
+            Licence(1,85,95,self.users[0],self.games[0],"69FUEHF"),
+
+            # Pret de Admin d'une licence à Cypooos
+            Licence(1,82,100,self.users[1],self.games[0],"69FUEHF",self.users[0],False),
+            Licence(1,82,100,self.users[0],self.games[0],"69FUEHF",self.users[1]),
             
-            Licence(1,100,120,self.users[0],self.games[1],"69FUEHF"),
-            Licence(1,100,120,self.users[0],self.games[2],"69FUEHF"),
-            Licence(1,100,130,self.users[0],self.games[2],"69FUEHF"),
+            Licence(1,80,90,self.users[0],self.games[1],"69FUEHF"),
+            Licence(1,80,90,self.users[0],self.games[2],"69FUEHF"),
+            Licence(1,80,90,self.users[0],self.games[2],"69FUEHF"),
         ]
         self.revues = []

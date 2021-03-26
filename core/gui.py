@@ -13,7 +13,7 @@ class GUI:
         # test:
         if debug:
             print(
-            "\n".join([x+":"+str(y) for x,y in self.lm.getStats(to_=112).items() ])
+            "\n".join([x+":"+str(y) for x,y in self.lm.getStats(add_after=12).items() ])
                 )
 
         self.window.mainloop()
