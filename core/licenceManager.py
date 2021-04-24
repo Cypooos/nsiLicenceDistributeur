@@ -179,6 +179,4 @@ class LicenceManager:
         return
 
 
-    self.connexion.commit()
-    self.connexion.close()
 
