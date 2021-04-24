@@ -1,11 +1,14 @@
 import sqlite3
 
+<<<<<<< HEAD
 from core.dataclasses.game import Game
 from core.dataclasses.licence import Licence
 from core.dataclasses.revue import Revue
 from core.dataclasses.user import User
 
 
+=======
+>>>>>>> d2497bbdea871b9abefe74b78b0d4ff8eab65159
 from datetime import date
 
 class LicenceManager:
@@ -24,12 +27,18 @@ class LicenceManager:
         self.reload()
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     def getStats(self):
 =======
+=======
+>>>>>>> d2497bbdea871b9abefe74b78b0d4ff8eab65159
 
     def getStats(self,add_after=10):
 
         now = (date.today() - date(2021,1,1)).days
+<<<<<<< HEAD
+>>>>>>> d2497bbdea871b9abefe74b78b0d4ff8eab65159
+=======
 >>>>>>> d2497bbdea871b9abefe74b78b0d4ff8eab65159
 
         returning = {}
@@ -62,13 +71,19 @@ class LicenceManager:
             points = []
             for licence in licences:
 <<<<<<< HEAD
+<<<<<<< HEAD
                 points.append([licence.date_debut,"+"])
                 points.append([licence.date_fin,"-"])
 =======
+=======
+>>>>>>> d2497bbdea871b9abefe74b78b0d4ff8eab65159
                 if licence.date_debut <= now+add_after:points.append([licence.date_debut,"+"])
                 if licence.date_fin <= now+add_after:points.append([licence.date_fin,"-"])
             
             if points == []:continue
+<<<<<<< HEAD
+>>>>>>> d2497bbdea871b9abefe74b78b0d4ff8eab65159
+=======
 >>>>>>> d2497bbdea871b9abefe74b78b0d4ff8eab65159
 
             points.sort(key=lambda x:x[0])
@@ -80,11 +95,14 @@ class LicenceManager:
 
                 points[i][1] = active_value
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 
             returning["graph"][game.name] = [(x[0],x[1]) for x in points]
 =======
+=======
+>>>>>>> d2497bbdea871b9abefe74b78b0d4ff8eab65159
             
             if points[0][0] <= minimum: minimum = points[0][0]
             if points[-1][0] >= maximum: maximum = points[-1][0]
@@ -94,6 +112,9 @@ class LicenceManager:
         returning["graph_min_x"] = minimum
         returning["graph_middle"] = now
         returning["graph_max_x"] = maximum
+<<<<<<< HEAD
+>>>>>>> d2497bbdea871b9abefe74b78b0d4ff8eab65159
+=======
 >>>>>>> d2497bbdea871b9abefe74b78b0d4ff8eab65159
 
         return returning
@@ -128,6 +149,7 @@ class LicenceManager:
 
         self.licences = [
 <<<<<<< HEAD
+<<<<<<< HEAD
             Licence(1,100,120,self.users[0],self.games[0],"69FUEHF"),
             Licence(1,103,110,self.users[0],self.games[0],"69FUEHF"),
             Licence(1,105,115,self.users[0],self.games[0],"69FUEHF"),
@@ -137,6 +159,8 @@ class LicenceManager:
             Licence(1,100,120,self.users[0],self.games[2],"69FUEHF"),
             Licence(1,100,130,self.users[0],self.games[2],"69FUEHF"),
 =======
+=======
+>>>>>>> d2497bbdea871b9abefe74b78b0d4ff8eab65159
             Licence(1,80,90,self.users[0],self.games[0],"69FUEHF"),
             Licence(1,83,90,self.users[0],self.games[0],"69FUEHF"),
             Licence(1,85,95,self.users[0],self.games[0],"69FUEHF"),
@@ -148,6 +172,9 @@ class LicenceManager:
             Licence(1,80,90,self.users[0],self.games[1],"69FUEHF"),
             Licence(1,80,90,self.users[0],self.games[2],"69FUEHF"),
             Licence(1,80,90,self.users[0],self.games[2],"69FUEHF"),
+<<<<<<< HEAD
+>>>>>>> d2497bbdea871b9abefe74b78b0d4ff8eab65159
+=======
 >>>>>>> d2497bbdea871b9abefe74b78b0d4ff8eab65159
         ]
         self.revues = []
