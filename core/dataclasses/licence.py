@@ -9,3 +9,18 @@ class Licence:
         self.hash = hash
         self.user_pret = user_pret
         self.is_recive = is_recive
+    
+    def getData(self):
+        return [self.id,self.date_debut,self.date_fin,self.user,self.game,self.hash,self.user_pret,self.is_recive]
+    
+    def generateCertificate(self):
+        return """
+Certificate for `{self.game}`
+
+user: `{self.user}`
+game: `{self.game}`
+pret: `{self.user_pret}`
+from: `{self.date_debut}`
+to  : `{self.date_fin}`
+"""
+

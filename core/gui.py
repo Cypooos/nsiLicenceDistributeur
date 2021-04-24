@@ -15,6 +15,8 @@ class GUI:
             print(
             "\n".join([x+":"+str(y) for x,y in self.lm.getStats(add_after=12).items() ])
                 )
+            t = input("Password to hash\n> ")
+            self.lm.checkPassword("",t)
 
         self.window.mainloop()
     

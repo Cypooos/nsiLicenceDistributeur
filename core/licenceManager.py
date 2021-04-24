@@ -1,5 +1,7 @@
 import sqlite3
 
+import hashlib
+
 from core.dataclasses.game import Game
 from core.dataclasses.licence import Licence
 from core.dataclasses.revue import Revue
@@ -11,6 +13,7 @@ from datetime import date
 class LicenceManager:
 
     path = "./projet.db"
+    SALT = "licenceManagerProject4832769195287"
 
     def __init__(self):
         self.users = []
@@ -28,7 +31,7 @@ class LicenceManager:
             self.connexion.execute("INSERT INTO Jeux VALUES (\""+'","'.join(data)+"\")")
             self.games.append(Game(*data))
         elif classToAdd == Licence:
-            self.connexion.execute("INSERT INTO Licenses VALUES (\""+'","'.join(data)+"\")")
+            self.connexion.execute("INSERT INTO Licences VALUES (\""+'","'.join(data)+"\")")
             self.licences.append(Licence(*data))
         elif classToAdd == Revue:
             self.connexion.execute("INSERT INTO Revues VALUES (\""+'","'.join(data)+"\")")
@@ -39,7 +42,7 @@ class LicenceManager:
         else:
             raise Exception("Unknow class named '"+str(classToAdd)+"' for database")
         self.connexion.commit()
-    
+
     def remove(self,classToRemove,id):
         # id est int ou str dépendant du contexte 
         if classToRemove == Game:
@@ -52,7 +55,7 @@ class LicenceManager:
         
         elif classToRemove == Licence:
             # la retirer de la base de donnée
-            self.connexion.execute("DELETE FROM Licenses WHERE ID ="+str(id))
+            self.connexion.execute("DELETE FROM Licences WHERE ID ="+str(id))
             # la retirer de la liste des jeux
             for licence in self.licences:
                 if licence.id == id:
@@ -83,6 +86,33 @@ class LicenceManager:
     def edit(self,classToEdit,newdata):
         self.remove(classToEdit,newdata[0]) # quelquesoit la classe, la clé primaire est l'élément 0
         self.add(classToEdit, newdata)
+
+
+    def checkHashedCertificate(self,certificate):
+        # check if a license has valid hash, not if it is still valid
+        data, hash = certificate.split("\nhash is ")
+        trueHash = hashlib.md5((data+self.SALT).encode('utf-8')).hexdigest() 
+        return hash == trueHash
+
+    def generateCertificate(self,licence):
+        data = licence.generateCertificate()
+        hash = hashlib.md5((data+self.SALT).encode('utf-8')).hexdigest() 
+        licence.hash = hash
+        self.edit(Licence,licence.getData())
+
+        return data +"\nhash is "+hash
+
+    def checkPassword(self,username,password):
+
+        # Password of Cypooos: `Test`
+        # Password of Angel: `12345`
+
+        result = hashlib.md5((password+self.SALT).encode('utf-8')).hexdigest()
+        print("hashed is :",result)
+        for user in self.users:
+            if user.name == username:
+                return user.password == result
+        return False 
 
 
     def getStats(self,add_after=10):
