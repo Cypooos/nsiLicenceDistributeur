@@ -10,7 +10,7 @@ class GUI:
 
         self.reload()
 
-        # test:
+        # Si nous somme en mode de test:
         if debug:
             print(
             "\n".join([x+":"+str(y) for x,y in self.lm.getStats(add_after=12).items() ])
