@@ -1,5 +1,7 @@
-from core.gui import GUI
+from core.gui import setup
 from core.licenceManager import LicenceManager
 
 
-GUI(LicenceManager(),debug=True)
+
+if __name__ == "__main__":
+    setup(LicenceManager(),debug=True)

@@ -22,8 +22,6 @@ class LicenceManager:
         self.revues = []
 
         # faire la connexion avec la db
-        self.connexion = sqlite3.connect('projet.db')
-        self.connexion.execute('PRAGMA foreign_keys = ON')
         self.reload()
 
     def add(self,classToAdd,data):
@@ -47,10 +45,10 @@ class LicenceManager:
         # id est int ou str dépendant du contexte 
         if classToRemove == Game:
             # le retirer de la base de donnée
-            self.connexion.execute("DELETE FROM Jeux WHERE ID ="+str(id))
+            self.connexion.execute("DELETE FROM Jeux WHERE NAME =\""+str(id)+"\"")
             # le retirer de la liste des jeux
             for game in self.games:
-                if game.id == id:
+                if game.name == id:
                     self.games.remove(game)
         
         elif classToRemove == Licence:
@@ -69,9 +67,9 @@ class LicenceManager:
                 if revue.id == id:
                     self.revues.remove(revue)
 
-        elif classToRemove == Revue:
+        elif classToRemove == User:
             # la retirer de la base de donnée
-            self.connexion.execute("DELETE FROM Users WHERE Nom ="+str(id))
+            self.connexion.execute("DELETE FROM Users WHERE name = \""+str(id)+"\"")
             # la retirer de la liste des jeux
             for user in self.users:
                 if user.name == id:
@@ -94,51 +92,55 @@ class LicenceManager:
         trueHash = hashlib.md5((data+self.SALT).encode('utf-8')).hexdigest() 
         return hash == trueHash
 
-    def generateCertificate(self,licence):
+    def generateCertificate(self,licenceID):
+        licence=[x for x in self.licences if x.id == int(licenceID)]
+        if licence == []: return False
+        licence = licence[0]
+
         data = licence.generateCertificate()
-        hash = hashlib.md5((data+self.SALT).encode('utf-8')).hexdigest() 
-        licence.hash = hash
-        self.edit(Licence,licence.getData())
+        hash = self.hashString(data)
 
         return data +"\nhash is "+hash
+
+    def hashString(self,string):
+        return hashlib.md5((string+self.SALT).encode('utf-8')).hexdigest()
 
     def checkPassword(self,username,password):
 
         # Password of Cypooos: `Test`
         # Password of Angel: `12345`
 
-        result = hashlib.md5((password+self.SALT).encode('utf-8')).hexdigest()
-        print("hashed is :",result)
+        result = self.hashString(password)
         for user in self.users:
             if user.name == username:
                 return user.password == result
-        return False 
+        return None 
 
 
-    def getStats(self,add_after=10):
+    def getStats(self,add_after=9999):
         # nous utillisons la date du date(2021,1,1) comme synchronisation relative
         now = (date.today() - date(2021,1,1)).days
 
         returning = {}
         
         returning["info_down"] = {
-            "Nombre de licences en total":len(self.licences),
-            "Nombre de pret en total":0,
-            "Nombre de licences active":0,
-            "Nombre de licences active pretee":0,
+            "nbLicences":len(self.licences),
+            "nbPrets":0,
+            "NBlicencesAct":0,
+            "nblicenceActPretees":0,
         }
 
-        game_to_licences = {x:[] for x in self.games}
+        game_to_licences = {x.name:[] for x in self.games}
 
         for licence in self.licences:
             game_to_licences[licence.game].append(licence)
             is_time = licence.date_debut <= now <= licence.date_fin
             is_pretee = licence.user_pret != None and not licence.is_recive
-            if is_time:returning["info_down"]["Nombre de licences active"] += 1
-            if is_time and is_pretee:returning["info_down"]["Nombre de licences active pretee"] += 1
-            if is_pretee:returning["info_down"]["Nombre de pret en total"] += 1
+            if is_time:returning["info_down"]["NBlicencesAct"] += 1
+            if is_time and is_pretee:returning["info_down"]["nblicenceActPretees"] += 1
+            if is_pretee:returning["info_down"]["nbPrets"] += 1
 
-                
+        
 
         returning["graph"] = {}
         minimum = 99999999999
@@ -166,12 +168,11 @@ class LicenceManager:
 
 
 
-            returning["graph"][game.name] = [(x[0],x[1]) for x in points]
             
             if points[0][0] <= minimum: minimum = points[0][0]
             if points[-1][0] >= maximum: maximum = points[-1][0]
             
-            returning["graph"][game.name] = [(x[0],x[1]) for x in points]
+            returning["graph"][game] = [(x[0],x[1]) for x in points]
         
         returning["graph_min_x"] = minimum
         returning["graph_middle"] = now
@@ -181,6 +182,8 @@ class LicenceManager:
  
 
     def reload(self):
+        self.connexion = sqlite3.connect('projet.db')
+        self.connexion.execute('PRAGMA foreign_keys = ON')
 
         # obtenir la liste des jeux, la mettre sous une liste d'instances de Game()
         games = self.connexion.execute("SELECT * FROM Jeux")
@@ -188,23 +191,26 @@ class LicenceManager:
         for row in games:
             self.games.append(Game(*row))
 
-        # obtenir la liste des revues, la mettre sous une liste d'instances de Revue()
-        revues = self.connexion.execute("SELECT * FROM Revues")
-        self.revues = []
-        for row in revues:
-            self.revues.append(Revue(*row))
-
         # obtenir la liste des users, la mettre sous une liste d'instances de Users()
         users = self.connexion.execute("SELECT * FROM Users")
         self.users = []
         for row in users:
-            self.revues.append(User(*row))
+            self.users.append(User(*row))
+        print("users:",self.users)
 
         # obtenir la liste des licences, la mettre sous une liste d'instances de Licence()
         licences = self.connexion.execute("SELECT * FROM Licences")
         self.licences = []
         for row in licences:
-            self.revues.append(Licence(*row))
+            row = list(row)
+            row[3] = [x for x in self.users if x.name == row[3]][0]
+            self.licences.append(Licence(*row))
+
+        # obtenir la liste des revues, la mettre sous une liste d'instances de Revue()
+        revues = self.connexion.execute("SELECT * FROM Revues")
+        self.revues = []
+        for row in revues:
+            self.revues.append(Revue(*row))
 
         return
 
