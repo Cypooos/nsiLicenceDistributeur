@@ -245,4 +245,3 @@ def setup(*arg,**kwargs):
     sys.exit(app.exec())
 
 
-
