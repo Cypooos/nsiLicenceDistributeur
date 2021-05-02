@@ -8,12 +8,13 @@ from core.dataclasses.revue import Revue
 from core.dataclasses.user import User
 
 
-from datetime import date
+from datetime import date,timedelta
 
 class LicenceManager:
 
     path = "./projet.db"
     SALT = "licenceManagerProject4832769195287"
+    date = (2021,1,1)
 
     def __init__(self):
         self.users = []
@@ -30,6 +31,7 @@ class LicenceManager:
             self.games.append(Game(*data))
         elif classToAdd == Licence:
             self.connexion.execute("INSERT INTO Licences VALUES (\""+'","'.join(data)+"\")")
+            data[3] = [x for x in self.users if x.name == data[3]][0]
             self.licences.append(Licence(*data))
         elif classToAdd == Revue:
             self.connexion.execute("INSERT INTO Revues VALUES (\""+'","'.join(data)+"\")")
@@ -116,10 +118,25 @@ class LicenceManager:
                 return user.password == result
         return None 
 
+    def strToDateInt(self,_string):
+        t = _string.split("/")
+        if len(t) != 3: return False
+        try:
+            j,m,y = int(t[0]), int(t[1]), int(t[2])
+            return (date(y,m,j) - date(*self.date)).days
+        except Exception as e:
+            print(e)
+            return False
+        
+    def dateIntToStr(self,_int):
+        _date = (date(*self.date) + timedelta(days=_int))
+
+        return str(_date.day)+"/"+ str(_date.month)+"/"+ str(_date.year)
+        
 
     def getStats(self,add_after=9999):
         # nous utillisons la date du date(2021,1,1) comme synchronisation relative
-        now = (date.today() - date(2021,1,1)).days
+        now = (date.today() - date(*self.date)).days
 
         returning = {}
         
@@ -135,7 +152,7 @@ class LicenceManager:
         for licence in self.licences:
             game_to_licences[licence.game].append(licence)
             is_time = licence.date_debut <= now <= licence.date_fin
-            is_pretee = licence.user_pret != None and not licence.is_recive
+            is_pretee = licence.user_pret != None
             if is_time:returning["info_down"]["NBlicencesAct"] += 1
             if is_time and is_pretee:returning["info_down"]["nblicenceActPretees"] += 1
             if is_pretee:returning["info_down"]["nbPrets"] += 1
@@ -150,12 +167,15 @@ class LicenceManager:
 
             points = []
             for licence in licences:
-                points.append([licence.date_debut,"+"])
-                points.append([licence.date_fin,"-"])
-                if licence.date_debut <= now+add_after:points.append([licence.date_debut,"+"])
-                if licence.date_fin <= now+add_after:points.append([licence.date_fin,"-"])
+                if licence.date_debut <= now+add_after:
+                    points.append([licence.date_debut," "])
+                    points.append([licence.date_debut,"+"])
+                if licence.date_fin <= now+add_after:
+                    points.append([licence.date_fin," "])
+                    points.append([licence.date_fin,"-"])
             
             if points == []:continue
+            print(points)
 
             points.sort(key=lambda x:x[0])
 

@@ -1,17 +1,16 @@
 class Licence:
 
-    def __init__(self, id, date_debut, date_fin, user, jeu, hash, user_pret=None, is_recive=True) -> None:
-        self.id = id
+    def __init__(self, id, date_debut, date_fin, user, jeu, hash, user_pret=None) -> None:
+        self.id = int(id)
         self.date_debut = int(date_debut)
         self.date_fin = int(date_fin)
         self.user = user # Pas un int, donner directment l'objet user associé ^^
-        self.game = jeu # Pareil
+        self.game = jeu # Nom du jeu ici
         self.hash = hash
         self.user_pret = user_pret
-        self.is_recive = is_recive
     
     def getData(self):
-        return [self.id,self.date_debut,self.date_fin,self.user,self.game,self.hash,self.user_pret,self.is_recive]
+        return [self.id,self.date_debut,self.date_fin,self.user,self.game,self.hash,self.user_pret]
     
     def generateCertificate(self):
         return """Certificate for `{self.game}`;
