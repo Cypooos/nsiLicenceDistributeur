@@ -13,8 +13,10 @@ from PyQt5.QtWidgets import (
 from core.gui_compiled import Ui_Interface
 import pyqtgraph as pg
 
+# Classe GUI principale
 class Window(QMainWindow, Ui_Interface):
 
+    # Liste des couleurs dans l'ordre pour le graphique 
     colors = ["y","r","b","o","k"]
 
     def __init__(self, licenceManager, debug=False, parent=None):
@@ -33,10 +35,11 @@ class Window(QMainWindow, Ui_Interface):
         self.verticalLayout_5.addWidget(self.graphPlot)
 
         print("Init setup Ui done")
-        self.connectSignalsSlots()
+        self.connectSignalsSlots() 
         print("Connect done")
         self.reloadGenerics()
 
+    # Connexion des boutons / menu au fonctions dans le code
     def connectSignalsSlots(self):
         self.actionClose.triggered.connect(self.close)
 
@@ -70,6 +73,7 @@ class Window(QMainWindow, Ui_Interface):
         # self.ChooseIns.currentIndexChanged.connect(self.select)
 
 
+    # Fonction qui ouvre une fenaitre pour convertir une date en nombre en utillisant licenceManger.strToDateInt
     def dateToInt(self):
         text, ok = QInputDialog.getText(self, 'Date en nombre', 'Veuillez entrer une date (J/M/Y) :')
         if ok:
@@ -90,8 +94,7 @@ class Window(QMainWindow, Ui_Interface):
                 "Le nombre de la date est de: "+str(result)
                 )
 
-
-
+    # Fonction qui ouvre une fenaitre pour convertir un nombre en date en utillisant licenceManger.dateIntToStr
     def intToDate(self):
         text, ok = QInputDialog.getText(self, 'Nombre en date', 'Veuillez entrer un nombre :')
         if ok:
@@ -99,23 +102,16 @@ class Window(QMainWindow, Ui_Interface):
                 textInt = int(text)
             except Exception as e:
                 print(e)
-                QMessageBox.about(
-                self,
-                "Nombre en date [résultat]",
-                "Mauvais format de nombre !"
-                )
+                QMessageBox.about(self,"Nombre en date [résultat]","Mauvais format de nombre !")
                 return
 
             result = self.licenceManager.dateIntToStr(textInt)
             print("---")
             print(result)
             print("---")
-            QMessageBox.about(
-            self,
-            "Nombre en date [résultat]",
-            "La date est le: "+str(result)
-            )
+            QMessageBox.about(self,"Nombre en date [résultat]","La date est le: "+str(result))
 
+    # Fonction qui ouvre une fenaitre pour généré un certificat en utillisant licenceManger.generateCertificate
     def certificateCreate(self):
         text, ok = QInputDialog.getText(self, 'Génerateur de Certificat', 'Veuillez entrer l\'ID de la licence :')
         if ok:
@@ -136,6 +132,7 @@ class Window(QMainWindow, Ui_Interface):
                 result
                 )
 
+    # Fonction qui ouvre une fenaitre pour vérifié un certificat en utillisant licenceManger.checkHashedCertificate
     def licenceCheck(self):
         text, ok = QInputDialog.getText(self, 'Vérificateur de Licence', 'Veuillez insérer le certificat :')
         if ok:
@@ -156,6 +153,7 @@ class Window(QMainWindow, Ui_Interface):
                 )
 
 
+    # Fonction qui ouvre une fenaitre pour hasher un mot de passe en utillisant licenceManger.hashString
     def passwordHash(self):
         text, ok = QInputDialog.getText(self, 'Password Hasher', 'Veuillez insérer le mot de passe à hasher :')
         if ok:
@@ -168,6 +166,7 @@ class Window(QMainWindow, Ui_Interface):
             )
 
     
+    # Fonction qui ouvre une fenaitre pour vérifier un mot de passe en utillisant licenceManger.checkPassword
     def passwordCheck(self):
         pass_, ok = QInputDialog.getText(self, 'Password Checker', 'Veuillez insérer le mot de passe à vérifier :')
         if not ok: return
@@ -193,8 +192,9 @@ class Window(QMainWindow, Ui_Interface):
             "L'utillisateur est inconnu !"
             )
     
+    # Fonction qui recharge les données du graphique
     def reloadGenerics(self):
-        infoGeneric = self.licenceManager.getStats()
+        infoGeneric = self.licenceManager.getStats() # On récupère les données
         print(infoGeneric)
 
         self.nbLicences.setText(str(infoGeneric["info_down"]["nbLicences"]))
@@ -225,6 +225,7 @@ class Window(QMainWindow, Ui_Interface):
         self.changeType()
 
 
+    # Fonction qui ajoute un élément à la base de donnée
     def addEle(self):
         try:
             self.licenceManager.add(self.activeMenu,self.textEdit.toPlainText().split("\n"))
@@ -232,6 +233,7 @@ class Window(QMainWindow, Ui_Interface):
         except Exception as e:
             print("ERROR:",e)
 
+    # Fonction qui modifie un élément à la base de donnée
     def editEle(self):
         try:
             self.licenceManager.edit(self.activeMenu,self.textEdit.toPlainText().split("\n"))
@@ -239,6 +241,7 @@ class Window(QMainWindow, Ui_Interface):
         except Exception as e:
             print("ERROR:",e)
         
+    # Fonction qui retire un élément à la base de donnée
     def removeEle(self):
         try:
             self.licenceManager.remove(self.activeMenu,self.comboBox_2.currentText())
@@ -246,6 +249,7 @@ class Window(QMainWindow, Ui_Interface):
         except Exception as e:
             print("ERROR:",e)
         
+    # Fonction pour recharger la table active dans e cas d'ajout / modofication de mes données
     def changeType(self):
         wanted = self.comboBox.currentText()
         if wanted == "Jeux": self.activeMenu = Game
@@ -254,6 +258,7 @@ class Window(QMainWindow, Ui_Interface):
         elif wanted == "Revues": self.activeMenu = Revue
         self.reloadElesList()
 
+    # Fonction qui recharge la liste des éléments selon la table selectionnée
     def reloadElesList(self):
         
         self.comboBox_2.clear()
@@ -270,6 +275,7 @@ class Window(QMainWindow, Ui_Interface):
         elif self.activeMenu == Revue:
             self.comboBox_2.addItems([str(x.id) for x in self.licenceManager.revues])
             
+    # Fonction qui recharge les statistiques sur les revues
     def reloadGameInfo(self):
         name = self.comboBox_3.currentText()
         if name == "":
@@ -306,6 +312,7 @@ class Window(QMainWindow, Ui_Interface):
             self.revuesMoy.setText(str(5*total/nbRev)+" %")
         
     
+    # Fonction qui recharge les données d'un élement selon la table et l'élément selectionné
     def reloadEleData(self):
         ele = self.comboBox_2.currentText()
         if ele == None or ele == "":return
@@ -320,7 +327,7 @@ class Window(QMainWindow, Ui_Interface):
         
         self.textEdit.setText("\n".join([str(x) for x in data]))
         
-
+    # Affichage d'une fenêtre de crédits
     def Credit(self):
         QMessageBox.about(
             self,
@@ -329,6 +336,7 @@ class Window(QMainWindow, Ui_Interface):
             "<p>Fais avec Python, Qt, SQLite</p>"
         )
     
+    # Affichage d'une fenêtre d'aide
     def Aide(self):
         QMessageBox.about(
             self,
@@ -338,6 +346,7 @@ class Window(QMainWindow, Ui_Interface):
         )
 
 
+# Instantation de la classe, (comment ça fonctionne avec QT)
 def setup(*arg,**kwargs):
     app = QApplication(sys.argv)
     win = Window(*arg,**kwargs)
