@@ -1,4 +1,4 @@
-Projet de base de donnée "LicenceDistributeur" par Cyprien BOUROTTE, Angela QUENUM et Laetitia SALE.
+Projet de base de donnée "LicenceDistributeur" réalisé en Terminale par Cyprien BOUROTTE, Angela QUENUM et Laetitia SALE.
 
 
 
